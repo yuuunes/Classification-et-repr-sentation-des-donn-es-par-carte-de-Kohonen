@@ -1,0 +1,70 @@
+source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
+
+#topologie du réseau
+n=5 #nombre de neurons
+l=10  #longueur du côté du carré
+
+#création des neurons
+x=array(dim=c(n,2))
+for (i in 1:n){
+  for (j in 1:2){
+    x[i,j]=runif(1,min=0,max=10)
+  } 
+}
+
+#initialisation des vecteurs référents
+w=array(dim=c(n,2))
+for (i in 1:n){
+  for (j in 1:2){
+    w[i,j]=runif(1,min=0,max=10)
+  } 
+}
+
+#on affiche les neurons et les vecteurs référents dans le plan
+plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,10),ylim = c(0,10),main = "la grille 10*10",type = "n")
+points(x,col='red',pch=19)
+points(w,col='green',pch=19)
+
+#on définit les fonctions compétition et coopération
+competition=function(a,w){  #faut pas oublier l'ordre lexicographique
+  c=NULL
+  for (i in 1:n){
+    c[i]=d(a,w[i,])
+  }
+  for (i in 1:n){
+    if(d(a,w[i,])==min(c)) return(w[i,])
+  }
+}
+
+coopération=function(a,w){
+  for(i in 1:n){
+    w[i,]=w[i,]-eps(t)*lambda(competition(a,w),x[i,])*(w[i,]-a)
+  }
+  return(w)
+}
+
+#on entre dans l'algo
+for (t in 1:M){  
+  a=runif(2,min=0,max=10) #on génére un point aléatoire "le stimuli"
+  #on redessine le plot à chaque fois pour pouvoir visualiser le stimuli mis à jour
+  plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,10),ylim = c(0,10),main = "la grille 10*10",type = "n")
+  points(x,col='red',pch=19)
+  points(w,col='green',pch=19)
+  #on trace le point
+  points(x=a[1],y=a[2],col='blue',pch=19)
+  # Pause pour visualiser le changement
+  Sys.sleep(0.5)
+  w=coopération(a,w) #on met à jour les w 
+  #on visualise les w mis à jour
+  plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,10),ylim = c(0,10),main = "la grille 10*10",type = "n")
+  points(x,col='red',pch=19)
+  points(w,col='green',pch=19)
+  points(x=a[1],y=a[2],col='blue',pch=19)
+  #une autre pause pour visualiser le changement
+  Sys.sleep(0.5)
+}
+
+
+
+
+
