@@ -43,7 +43,7 @@ coopération=function(a,w){
   return(w)
 }
 
-#on entre dans l'algo
+#on entre dans la boucle 
 for (t in 1:M){  
   a=runif(2,min=0,max=l) #on génére un point aléatoire "le stimuli"
   #on redessine le plot à chaque fois pour pouvoir visualiser le stimuli mis à jour
