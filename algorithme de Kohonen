@@ -1,7 +1,7 @@
 source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
 
 #topologie du réseau
-n=5 #nombre de neurons
+n=100 #nombre de neurons
 l=10  #longueur du côté du carré
 
 #création des neurons
