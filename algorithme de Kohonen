@@ -13,7 +13,7 @@ for (i in 1:n){
 }
 
 plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "la grille l*l",type = "n")
-points(w,col='green',pch=19)
+points(w,col='red',pch=19)
 lines(w[, 1], w[, 2], col = "blue")
 
 
@@ -24,35 +24,32 @@ competition=function(a,w){  #faut pas oublier l'ordre lexicographique
     c[i]=d(a,w[i,])
   }
   for (i in 1:n){
-    if(d(a,w[i,])==min(c)) return(x[i,])
+    if(d(a,w[i,])==min(c)) return(x[i])
   }
 }
 
 coopération=function(a,w){
   for(i in 1:n){
-    w[i,]=w[i,]-eps(t)*lambda(competition(a,w),x[i,])*(w[i,]-a)
+    w[i,]=w[i,]-eps(t)*lambda(competition(a,w),x[i])*(w[i,]-a)
   }
   return(w)
 }
 
 #on entre dans l'algo
 for (t in 1:M){  
-  a=runif(2,min=0,max=l) #on génére un point aléatoire "le stimuli"
-  plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "la grille l*l",type = "n")
-  points(w,col='green',pch=19)
-  lines(w[, 1], w[, 2], col = "blue")
-  # Pause pour visualiser le changement
-  Sys.sleep(0.5)
+  a=runif(2,min=0,max=l) #on génére un vecteur aléatoire
   w=coopération(a,w) #on met à jour les w 
   #on visualise les w mis à jour
-  plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "la grille l*l",type = "n")
-  points(w,col='green',pch=19)
-  lines(w[, 1], w[, 2], col = "blue")
-  #une autre pause pour visualiser le changement
-  Sys.sleep(0.5)
+  #plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "la grille l*l",type = "n")
+  #points(w,col='red',pch=19)
+  #lines(w[, 1], w[, 2], col = "blue")
+  #Pause pour visualiser le changement
+  #Sys.sleep(0.5)
 }
 
 
-
+plot(x=1, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "la grille l*l",type = "n")
+points(w,col='red',pch=19)
+lines(w[, 1], w[, 2], col = "blue")
 
 
