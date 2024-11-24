@@ -1,0 +1,89 @@
+source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
+# Dimensions de la grille
+n <- 10 # dimension du tableau de donnée
+l <- 10  #longueur du carré
+
+# Générer le data frame
+coords_df <- expand.grid(row = 1:n, col = 1:n)  # Grille des indices
+coords_df$coords <- lapply(1:(n * n), function(i) c(runif(1, 0, l), runif(1, 0, l)))
+
+# Affichage
+#print(coords_df)
+
+# Exemple d'accès à une cellule
+#print(coords_df$coords[[1]])  # Coordonnées (x, y) de la première cellule
+
+# Extraire toutes les coordonnées pour affichage
+all_coords <- do.call(rbind, coords_df$coords)
+
+# Tracer les points dans le plan
+plot(all_coords[, 1], all_coords[, 2], xlim = c(0, 10), ylim = c(0, 10),
+     xlab = "X", ylab = "Y", main = "Points aléatoires dans [0,10] x [0,10]",
+     col = "blue", pch = 16)
+
+# Fonction pour trouver les voisins d'une cellule donnée
+find_neighbors <- function(row, col, n) {
+  neighbors <- list()
+  if (row > 1) neighbors <- append(neighbors, list(c(row - 1, col)))  # Haut
+  if (row < n) neighbors <- append(neighbors, list(c(row + 1, col)))  # Bas
+  if (col > 1) neighbors <- append(neighbors, list(c(row, col - 1)))  # Gauche
+  if (col < n) neighbors <- append(neighbors, list(c(row, col + 1)))  # Droite
+  return(neighbors)
+}
+
+# Relier les points à leurs voisins et tracer les connexions
+for (i in 1:nrow(coords_df)) {
+  point <- coords_df$coords[[i]]  # Extraire les coordonnées du point
+  
+  # Identifier les voisins
+  row <- coords_df$row[i]
+  col <- coords_df$col[i]
+  neighbors <- find_neighbors(row, col, n)
+  
+  # Relier le point à ses voisins
+  for (neighbor in neighbors) {
+    neighbor_row <- neighbor[1]
+    neighbor_col <- neighbor[2]
+    neighbor_coords <- coords_df$coords[[which(coords_df$row == neighbor_row & coords_df$col == neighbor_col)]]
+    lines(c(point[1], neighbor_coords[1]), c(point[2], neighbor_coords[2]), col = "gray")
+  }
+}
+
+#algorithme de Kohonen
+for (t in 1:M){
+  p=runif(2,min=0,max=l) #on génére un vecteur aléatoire dans l'espace des données
+  
+  #phase de compétition
+  dist <- sapply(1:(n * n), function(i) d(p, coords_df$coords[[i]]))
+  min_index=which.min(dist) 
+  argmin=c(coords_df$row[min_index],coords_df$col[min_index]) # le neuron gagnant
+  #phase de coopération
+  for(i in 1:(n * n)){
+    coords_df$coords[[i]]=coords_df$coords[[i]]+eps(t)*lambda(argmin,c(coords_df$row[i],coords_df$col[i]),t)*(p-coords_df$coords[[i]])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
+  }
+  # Affichage à chaque itération pour observer l'évolution des vecteurs référents
+  # Affichage : Extraire toutes les coordonnées pour observer l'évolution
+  all_coords <- do.call(rbind, coords_df$coords)
+  plot(all_coords[, 1], all_coords[, 2], xlim = c(0, l), ylim = c(0, l),
+       xlab = "X", ylab = "Y", main = paste("Itération", t, "de l'algorithme"),
+       col = "blue", pch = 16)
+  
+  # Relier les points à leurs voisins pour visualiser la grille
+  for (i in 1:nrow(coords_df)) {
+    point <- coords_df$coords[[i]]
+    row <- coords_df$row[i]
+    col <- coords_df$col[i]
+    neighbors <- find_neighbors(row, col, n)
+    for (neighbor in neighbors) {
+      neighbor_row <- neighbor[1]
+      neighbor_col <- neighbor[2]
+      neighbor_coords <- coords_df$coords[[which(coords_df$row == neighbor_row & coords_df$col == neighbor_col)]]
+      lines(c(point[1], neighbor_coords[1]), c(point[2], neighbor_coords[2]), col = "gray")
+    }
+  }
+  
+  # Pause pour observer les changements à chaque itération
+  Sys.sleep(0.05)
+}
+
+
