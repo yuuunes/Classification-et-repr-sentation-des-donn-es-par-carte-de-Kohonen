@@ -26,7 +26,7 @@ for (t in 1:M){
   for(k in 1:n){
     w[k,]=w[k,]+eps(t)*lambda(argmin,k,t)*(p-w[k,])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
   }
-  # Affichage à chaque itération pour observer l'évolution des poids
+  # Affichage à chaque itération pour observer l'évolution des vecteurs référents
   plot(w[, 1], w[, 2], col = "red", pch = 19,main = paste("Itération", t , "de l'algorithme"),xlab = "Axe X", ylab = "Axe Y", xlim = c(0,l), ylim = c(0,l))
   lines(w[, 1], w[, 2], col = "blue")
   Sys.sleep(0.05)
