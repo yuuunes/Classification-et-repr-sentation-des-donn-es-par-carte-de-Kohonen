@@ -4,15 +4,15 @@ d=function(i,j){                        #la distance euclidienne
   return(sqrt(sum((i-j)^2)))
 }
 
-M=20000                                  #seuil de l'algorithme
+M=20000                                 #seuil de l'algorithme
 
 sigma=function(t){                      #sigma de t
   si=5
   sf=0.2
   return(si*((sf/si)^(t/M)))
 }
-lambda=function(i,j){                  #la fonction de voisinage
-  return(exp(-(i-j)^2/(2*sigma(t)^2)))
+lambda=function(i,j,t){                  #la fonction de voisinage
+  return(exp(-d(i,j)^2/(2*sigma(t)^2)))
 }
 
 eps=function(t){                       #le taux d'adaptation
