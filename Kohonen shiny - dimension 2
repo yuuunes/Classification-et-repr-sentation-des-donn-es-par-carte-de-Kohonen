@@ -1,0 +1,84 @@
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Algorithme de Kohonen - Suivi des Itérations"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("n", "Dimension du tableau de données (n)", value = 10, min = 1, max = 30),
+      numericInput("M", "Nombre d'itérations (M)", value = 50, min = 1, max = 500),
+      actionButton("run", "Exécuter l'algorithme"),
+      sliderInput("t_input", "Sélectionner t (itération)", min = 1, max = 100, value = 1, step = 1)
+    ),
+    
+    mainPanel(
+      plotOutput("kohonenPlot")
+    )
+  )
+)
+
+server <- function(input, output,session){
+  
+  # Lancer l'algorithme lorsqu'on appuie sur "Exécuter"
+  observeEvent(input$run, {
+    # Charger les fonctions nécessaires 
+    source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
+    
+    # Initialiser les paramètres
+    n <- input$n
+    l <- n^2  # Calcul de la longueur comme n^2
+    M <- input$M
+    
+    # Initialisation de la grille et des coordonnées
+    coords_df <- expand.grid(row = 1:n, col = 1:n)
+    coords_df$coords <- lapply(1:(n * n), function(i) c(runif(1, 0, l), runif(1, 0, l)))
+    
+    # Mettre à jour la valeur max du slider avec la valeur de M
+    updateSliderInput(session, "t_input", max = M)
+    
+    # Observer le changement de la valeur de t
+    observe({
+      t <- input$t_input  # Obtenir la valeur de t depuis le slider
+      if (t <= M) {
+        # Exécuter l'algorithme pour l'itération t
+        #pour pouvoir rendre le résultat à l'itération t on doit modifier les w t fois
+        for (t_1 in 1:t){
+          p=runif(2,min=0,max=l) #on génére un vecteur aléatoire dans l'espace des données
+          
+          #phase de compétition
+          dist <- sapply(1:(n * n), function(i) d(p, coords_df$coords[[i]]))
+          min_index=which.min(dist) 
+          argmin=c(coords_df$row[min_index],coords_df$col[min_index]) # le neuron gagnant
+          #phase de coopération
+          for(i in 1:(n * n)){
+            coords_df$coords[[i]]=coords_df$coords[[i]]+eps(t_1)*lambda(argmin,c(coords_df$row[i],coords_df$col[i]),t_1)*(p-coords_df$coords[[i]])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
+          }
+        }
+        
+        # Rendre le graphique pour l'itération courante
+        output$kohonenPlot <- renderPlot({
+          all_coords <- do.call(rbind, coords_df$coords)
+          plot(all_coords[, 1], all_coords[, 2], xlim = c(0, l), ylim = c(0, l),
+               xlab = "X", ylab = "Y", main = paste("Itération", t, "de l'algorithme"),
+               col = "blue", pch = 16)
+          
+          # Relier les points à leurs voisins
+          for (i in 1:nrow(coords_df)) {
+            point <- coords_df$coords[[i]]
+            row <- coords_df$row[i]
+            col <- coords_df$col[i]
+            neighbors <- find_neighbors(row, col, n)
+            for (neighbor in neighbors) {
+              neighbor_row <- neighbor[1]
+              neighbor_col <- neighbor[2]
+              neighbor_coords <- coords_df$coords[[which(coords_df$row == neighbor_row & coords_df$col == neighbor_col)]]
+              lines(c(point[1], neighbor_coords[1]), c(point[2], neighbor_coords[2]), col = "gray")
+            }
+          }
+        })
+      }
+    })
+  })
+}
+
+shinyApp(ui = ui, server = server)
