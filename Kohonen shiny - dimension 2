@@ -23,7 +23,14 @@ server <- function(input, output,session){
   observeEvent(input$run, {
     # Charger les fonctions nécessaires 
     source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
-    
+    find_neighbors <- function(row, col, n) {
+      neighbors <- list()
+      if (row > 1) neighbors <- append(neighbors, list(c(row - 1, col)))  # Haut
+      if (row < n) neighbors <- append(neighbors, list(c(row + 1, col)))  # Bas
+      if (col > 1) neighbors <- append(neighbors, list(c(row, col - 1)))  # Gauche
+      if (col < n) neighbors <- append(neighbors, list(c(row, col + 1)))  # Droite
+      return(neighbors)
+    }
     # Initialiser les paramètres
     n <- input$n
     l <- n^2  # Calcul de la longueur comme n^2
