@@ -2,6 +2,7 @@ source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initi
 # paramétres
 n <- 10 # nombre de neurons égal à n^2, on les représente dans un tableau n*n
 l <- n^2  #espace des données [0,l]*[0,l]
+M <- 5000 #seuil de l'algorithme
 
 # Générer le tableau des vecteurs référents ; on associe à chaque unité (ou neuron) un vecteur dans l'espace des données 
 df <- expand.grid(row = 1:n, col = 1:n)  # Grille des indices
