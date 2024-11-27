@@ -4,8 +4,6 @@ d=function(i,j){                        #la distance euclidienne
   return(sqrt(sum((i-j)^2)))
 }
 
-M=20000                                 #seuil de l'algorithme
-
 sigma=function(t){                      #sigma de t
   si=5
   sf=0.2
