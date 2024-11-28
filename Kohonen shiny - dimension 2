@@ -6,7 +6,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       numericInput("n", "Dimension du tableau de données (n)", value = 10, min = 1, max = 30),
-      numericInput("M", "Nombre d'itérations (M)", value = 50, min = 1, max = 500),
+      numericInput("M", "Nombre d'itérations (M)", value = 100, min = 1, max = 5000),
       actionButton("run", "Exécuter l'algorithme"),
       sliderInput("t_input", "Sélectionner t (itération)", min = 1, max = 100, value = 1, step = 10)
     ),
@@ -21,7 +21,8 @@ server <- function(input, output,session){
   
   # Lancer l'algorithme lorsqu'on appuie sur "Exécuter"
   observeEvent(input$run, {
-    # Charger les fonctions nécessaires 
+    
+    #Charger les fonctions nécessaires #########################################
     source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
     recherche_voisins <- function(row, col, n) {
       voisins <- list()
@@ -31,12 +32,12 @@ server <- function(input, output,session){
       if (col < n) voisins <- append(voisins, list(c(row, col + 1)))  # Droite
       return(voisins)
     }
-    # Initialiser les paramètres
+    #Initialiser les paramètres ################################################
     n <- input$n
     l <- n^2  # Calcul de la longueur comme n^2
     M <- input$M
     
-    # Initialisation de la grille et des coordonnées
+    # Initialisation de la grille et des coordonnées###########################
     df <- expand.grid(row = 1:n, col = 1:n)  
     df$coord <- lapply(1:(n * n), function(i) c(runif(1, 0, l), runif(1, 0, l)))
     
@@ -46,51 +47,49 @@ server <- function(input, output,session){
     # Observer le changement de la valeur de t
     observe({
       t <- input$t_input  # Obtenir la valeur de t depuis le slider
-      if (t <= M) {
-        # Exécuter l'algorithme pour l'itération t
-        #pour pouvoir rendre le résultat à l'itération t on doit modifier les w t fois
-        for (t_1 in 1:t){
-          p=runif(2,min=0,max=l) #on génére un vecteur aléatoire dans l'espace des données
-          
-          #phase de compétition
-          dist <- sapply(1:(n * n), function(i) d(p, df$coord[[i]]))
-          min_index=which.min(dist) 
-          argmin=c(df$row[min_index],df$col[min_index]) # le neuron gagnant
-          #phase de coopération
-          for(i in 1:(n * n)){
-            df$coord[[i]]=df$coord[[i]]+eps(t)*lambda(argmin,c(df$row[i],df$col[i]),t)*(p-df$coord[[i]])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
+      # Exécuter l'algorithme pour l'itération t
+      #pour pouvoir rendre le résultat à l'itération t on doit modifier les w t fois
+      for (t_1 in 1:t){
+        p=runif(2,min=0,max=l) #on génére un vecteur aléatoire dans l'espace des données
+        
+        #phase de compétition
+        dist <- sapply(1:(n * n), function(i) d(p, df$coord[[i]]))
+        min_index=which.min(dist) 
+        argmin=c(df$row[min_index],df$col[min_index]) # le neuron gagnant
+        #phase de coopération
+        for(i in 1:(n * n)){
+          df$coord[[i]]=df$coord[[i]]+eps(t_1)*lambda(argmin,c(df$row[i],df$col[i]),t_1)*(p-df$coord[[i]])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
+        }
+      }
+      
+      # Rendre le graphique pour l'itération courante
+      output$kohonenPlot <- renderPlot({
+        #extraire les coordonnées des vecteurs référents du tableau de données########
+        x=NULL
+        y=NULL
+        for (i in 1:n^2){
+          x=append(x,df$coord[[i]][1])
+          y=append(y,df$coord[[i]][2])
+        }
+        ######################################################################
+        plot(x,y, xlim = c(0, l), ylim = c(0, l),
+             xlab = "X", ylab = "Y", main = paste("Itération", t, "de l'algorithme"),
+             col = "blue", pch = 16)
+        
+        # Relier les points à leurs voisins
+        for (i in 1:nrow(df)) {
+          point <- df$coord[[i]]
+          row <- df$row[i]
+          col <- df$col[i]
+          voisins <- recherche_voisins(row, col, n)
+          for (voisin in voisins) {
+            voisin_row <- voisin[1]
+            voisin_col <- voisin[2]
+            voisin_coord <- df$coord[[which(df$row == voisin_row & df$col == voisin_col)]]
+            lines(c(point[1], voisin_coord[1]), c(point[2], voisin_coord[2]), col = "gray")
           }
         }
-        
-        # Rendre le graphique pour l'itération courante
-        output$kohonenPlot <- renderPlot({
-          #extraire les coordonnées des vecteurs référents du tableau de données########
-          x=NULL
-          y=NULL
-          for (i in 1:n^2){
-            x=append(x,df$coord[[i]][1])
-            y=append(y,df$coord[[i]][2])
-          }
-          ######################################################################
-          plot(x,y, xlim = c(0, l), ylim = c(0, l),
-               xlab = "X", ylab = "Y", main = paste("Itération", t, "de l'algorithme"),
-               col = "blue", pch = 16)
-          
-          # Relier les points à leurs voisins
-          for (i in 1:nrow(df)) {
-            point <- df$coord[[i]]
-            row <- df$row[i]
-            col <- df$col[i]
-            voisins <- recherche_voisins(row, col, n)
-            for (voisin in voisins) {
-              voisin_row <- voisin[1]
-              voisin_col <- voisin[2]
-              voisin_coord <- df$coord[[which(df$row == voisin_row & df$col == voisin_col)]]
-              lines(c(point[1], voisin_coord[1]), c(point[2], voisin_coord[2]), col = "gray")
-            }
-          }
-        })
-      }
+      })
     })
   })
 }
