@@ -1,8 +1,11 @@
-source("C:/Users/User/OneDrive/Documents/books/euria/algorithme de kohonen/initialisation des paramétres.R")
+#chargement du fichier "initialisation des paramétres". Prendre garde de bien mettre deux backslash \\
+
+source("C:\\Users\\User\\Desktop\\projet informatique\\initialisation des paramétres.R")
 
 #topologie du réseau_grille de dimension 1 (une ligne)
 n=100 #nombre de neurons
 l=10  #l'espace des données [0,l]*[0,l]
+M=5000  #seuil de l'algorithme
 
 #initialisation aléatoire des vecteurs référents
 w=array(dim=c(n,2))
@@ -13,8 +16,8 @@ for (i in 1:n){
 }
 
 #on visualise les vecteurs référents
-plot(w[, 1], w[, 2],col='red',pch=19, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "l'espace des données")
-lines(w[, 1], w[, 2], col = "blue")
+plot(w[, 1], w[, 2],col='blue',pch=16, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "l'espace des données")
+lines(w[, 1], w[, 2], col = "gray")
 
 #algorithme de Kohonen
 for (t in 1:M){
@@ -24,12 +27,12 @@ for (t in 1:M){
   argmin=which.min(dist) #le neuron gagnant
   #phase de coopération
   for(k in 1:n){
-    w[k,]=w[k,]+eps(t)*lambda(argmin,k,t)*(p-w[k,])  #les neurons sont déterminés par leurs indices ; on met à jour les vecteurs référents
+    w[k,]=w[k,]+eps(t)*lambda(argmin,k,t)*(p-w[k,])  #mise à jour des vecteurs référents
   }
   # Affichage à chaque itération pour observer l'évolution des vecteurs référents
-  plot(w[, 1], w[, 2], col = "red", pch = 19,main = paste("Itération", t , "de l'algorithme"),xlab = "Axe X", ylab = "Axe Y", xlim = c(0,l), ylim = c(0,l))
-  lines(w[, 1], w[, 2], col = "blue")
-  Sys.sleep(0.05)
+  plot(w[, 1], w[, 2], col = "blue", pch = 16,main = paste("Itération", t , "de l'algorithme"),xlab = "Axe X", ylab = "Axe Y", xlim = c(0,l), ylim = c(0,l))
+  lines(w[, 1], w[, 2], col = "gray")
+  Sys.sleep(0.05) #pause pour visualiser le changement
 }
 
 
