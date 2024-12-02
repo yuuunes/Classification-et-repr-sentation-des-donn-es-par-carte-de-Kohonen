@@ -1,1 +1,39 @@
+#chargement du fichier "initialisation des paramétres". Prendre garde de bien mettre deux backslash \\
+
+source("C:\\Users\\User\\Desktop\\projet informatique\\initialisation des paramétres.R")
+
+#topologie du réseau_grille de dimension 1 (une ligne)
+n=100 #nombre de neurons
+l=10  #l'espace des données [0,l]*[0,l]
+M=20000  #seuil de l'algorithme
+
+#initialisation aléatoire des vecteurs référents
+w=array(dim=c(n,2))
+for (i in 1:n){
+  for (j in 1:2){
+    w[i,j]=runif(1,min=0,max=l)
+  } 
+}
+
+#on visualise les vecteurs référents
+plot(w[, 1], w[, 2],col='blue',pch=16, xlab = "axe des x",ylab = "axe des y",xlim =c(0,l),ylim = c(0,l),main = "l'espace des données")
+lines(w[, 1], w[, 2], col = "gray")
+
+#algorithme de Kohonen
+for (t in 1:M){
+  p=runif(2,min=0,max=l) #on génére un vecteur aléatoire dans l'espace des données
+  #phase de compétition
+  dist=sapply(1:n,function(i) d(p,w[i,]))
+  argmin=which.min(dist) #le neuron gagnant
+  #phase de coopération
+  for(k in 1:n){
+    w[k,]=w[k,]+eps(t,M)*lambda(argmin,k,t,M)*(p-w[k,])  #mise à jour des vecteurs référents
+  }
+}
+
+# Affichage du résultat
+plot(w[, 1], w[, 2], col = "blue", pch = 16,main = paste("Itération", t , "de l'algorithme"),xlab = "Axe X", ylab = "Axe Y", xlim = c(0,l), ylim = c(0,l))
+lines(w[, 1], w[, 2], col = "gray")
+
+
 
