@@ -1,1 +1,21 @@
+#les fonctions nécessaires
+
+d=function(i,j){                        #la distance euclidienne
+  return(sqrt(sum((i-j)^2)))
+}
+
+sigma=function(t,M){                      #sigma de t
+  si=5
+  sf=0.2
+  return(si*((sf/si)^(t/M)))
+}
+lambda=function(i,j,t,M){                  #la fonction de voisinage
+  return(exp(-d(i,j)^2/(2*sigma(t,M)^2)))
+}
+
+eps=function(t,M){                       #le taux d'adaptation
+  ei=0.1
+  ef=0.005
+  return(ei*((ef/ei)^(t/M)))
+}
 
